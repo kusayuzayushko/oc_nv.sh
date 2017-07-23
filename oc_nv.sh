@@ -44,7 +44,7 @@ OptionMod powr_lim
 function gpu_check() {
   line_n=$1
   re='[[:space:]]GTX[[:space:]]1050[[:space:]]'
-  if [[ "${gpu_info[$line_n]}" =~ $re ]]; then
+  if [[ "${gpu_list[$line_n]}" =~ $re ]]; then
     true
   else
     false
