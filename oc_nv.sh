@@ -59,7 +59,7 @@ for ((x=0; x<gpu_number; x++))  do
   else
     gpu_type=3
   fi
-  echo "Applying CoreOffset: ${core_clk[$x]} MemoryOffset: ${memo_clk[$x]} for GPU $x"
+  echo "Applying CoreOffset: ${core_clk[$x]} MemoryOffset: ${memo_clk[$x]} for GPU $x with GPU Type: $gpu_type"
   nvidia-settings -a [gpu:$x]/GpuPowerMizerMode=1 > /dev/null 2>&1 &
   nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
   nvidia-settings -a [gpu:$x]/GPUMemoryTransferRateOffset[$gpu_type]=${memo_clk[$x]} > /dev/null 2>&1 &
