@@ -11,7 +11,7 @@ exit 1
 fi
 # getting number of gpu
 IFS=$'\n' read -d '' -r -a gpu_list <<< "$gpu_info"
-gpu_number=${#gpu_info[@]}
+gpu_number=${#gpu_list[@]}
 # splitting OC values devided by comma into arrays
 IFS=', ' read -r -a core_clk <<< "$1"
 IFS=', ' read -r -a memo_clk <<< "$2"
