@@ -10,6 +10,7 @@ then
 exit 1
 fi
 # getting number of gpu
+gpu_info=`nvidia-smi -L`
 IFS=$'\n' read -d '' -r -a gpu_list <<< "$gpu_info"
 gpu_number=${#gpu_list[@]}
 # splitting OC values devided by comma into arrays
