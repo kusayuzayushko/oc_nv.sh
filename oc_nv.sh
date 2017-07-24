@@ -30,9 +30,9 @@ function OptionMod() {
 			array+=(${array[0]})
 		done
 	else
-		# Should not be the case, but...
+		# If number of parameters less then gpu's number, use last for rest.
 		for (( i = $gpu_number - ${#array[@]}; i < $gpu_number ; i++ )); do
-			array+=("0")
+			array+=(${array[-1]})
 		done
 	fi
 }
