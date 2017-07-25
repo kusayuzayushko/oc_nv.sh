@@ -5,7 +5,7 @@ source $CONFIG_FILE
 export DISPLAY=:0
 
 if [ -z "$1" ] || [ -z "$2" ] ||  [ -z "$3" ]
-then
+	then
 	echo "Missing variable"
 	exit 1
 fi
@@ -51,6 +51,31 @@ function gpu_check() {
 	fi
 }
 
+# checking if user trying to set unsupported power limit
+function power_limit_set {
+	pow_array=()
+	regexp='([0-9]+)\.[0-9]+[[:space:]]W,[[:space:]]([0-9]+)\.[0-9]+[[:space:]]W'
+	pow_inf=`nvidia-smi -i $2 --format=csv --query-gpu=power.min_limit,power.max_limit`
+	[[ $pow_inf =~ $regexp ]] && for (( i = 0; i < 3; i++ )); do
+		pow_array+=("${BASH_REMATCH[$i]}")
+	done
+	# If user set power limit less than maxinum
+	if [ "$1" -lt "${pow_array[1]}" ]; then
+		echo "Available power limit for GPU $2 is ${pow_array[0]}"
+		echo "Applying PowerLimit: ${pow_array[1]} for GPU $2"
+		sudo nvidia-smi --id=$2 -pl ${pow_array[1]} > /dev/null 2>&1 &
+	# If user set power limit higer than maximum
+elif [ "$1" -gt "${pow_array[2]}" ]; then
+	echo "Available power limit for GPU $2 is ${pow_array[0]}"
+	echo "Applying PowerLimit: ${pow_array[2]} watt for GPU $2"
+	sudo nvidia-smi --id=$2 -pl ${pow_array[2]} > /dev/null 2>&1 &
+	# Finally!
+else
+	echo "Applying PowerLimit: $1 watt for GPU $2"
+	sudo nvidia-smi --id=$2 -pl $1 > /dev/null 2>&1 &
+fi
+}
+
 # Setting Parameters to each gpu
 sudo nvidia-smi -pm 1 &
 for ((x=0; x<gpu_number; x++))  do
@@ -63,9 +88,10 @@ for ((x=0; x<gpu_number; x++))  do
 	nvidia-settings -a [gpu:$x]/GpuPowerMizerMode=1 > /dev/null 2>&1 &
 	nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
 	nvidia-settings -a [gpu:$x]/GPUMemoryTransferRateOffset[$gpu_type]=${memo_clk[$x]} > /dev/null 2>&1 &
-	if [ "${powr_lim[$x]}" -ge "10" ] && [ "${powr_lim[$x]}" -le "400" ]; then
-		echo "Applying PowerLimit: ${powr_lim[$x]} watt for GPU $x"
-		sudo nvidia-smi --id=$x -pl ${powr_lim[$x]} > /dev/null 2>&1 &
-	fi
-	sleep 0.2
+	power_limit_set "${powr_lim[$x]}" $x
+#	if [ "${powr_lim[$x]}" -ge "10" ] && [ "${powr_lim[$x]}" -le "400" ]; then
+#		echo "Applying PowerLimit: ${powr_lim[$x]} watt for GPU $x"
+#		sudo nvidia-smi --id=$x -pl ${powr_lim[$x]} > /dev/null 2>&1 &
+#	fi
+sleep 0.2
 done
