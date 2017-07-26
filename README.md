@@ -4,6 +4,10 @@ small and simple overclocking script for NVIDIA GPU to replace default script in
 ## Installation
 Connect to you mining rig (directly or via ssh).
 
+Install git
+
+`sudo apt install git-core`
+
 Clone repository:
 
 `git clone https://github.com/kusayuzayushko/oc_nv.sh.git`
