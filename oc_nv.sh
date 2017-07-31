@@ -65,15 +65,15 @@ function power_limit_set {
 		echo "Applying PowerLimit: ${pow_array[1]} for GPU $2"
 		sudo nvidia-smi --id=$2 -pl ${pow_array[1]} > /dev/null 2>&1 &
 	# If user set power limit higer than maximum
-elif [ "$1" -gt "${pow_array[2]}" ]; then
-	echo "Available power limit for GPU $2 is ${pow_array[0]}"
-	echo "Applying PowerLimit: ${pow_array[2]} watt for GPU $2"
-	sudo nvidia-smi --id=$2 -pl ${pow_array[2]} > /dev/null 2>&1 &
-	# Finally!
-else
-	echo "Applying PowerLimit: $1 watt for GPU $2"
-	sudo nvidia-smi --id=$2 -pl $1 > /dev/null 2>&1 &
-fi
+	elif [ "$1" -gt "${pow_array[2]}" ]; then
+		echo "Available power limit for GPU $2 is ${pow_array[0]}"
+		echo "Applying PowerLimit: ${pow_array[2]} watt for GPU $2"
+		sudo nvidia-smi --id=$2 -pl ${pow_array[2]} > /dev/null 2>&1 &
+		# Finally!
+	else
+		echo "Applying PowerLimit: $1 watt for GPU $2"
+		sudo nvidia-smi --id=$2 -pl $1 > /dev/null 2>&1 &
+	fi
 }
 
 # Setting Parameters to each gpu
@@ -89,9 +89,9 @@ for ((x=0; x<gpu_number; x++))  do
 	nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
 	nvidia-settings -a [gpu:$x]/GPUMemoryTransferRateOffset[$gpu_type]=${memo_clk[$x]} > /dev/null 2>&1 &
 	power_limit_set "${powr_lim[$x]}" $x
-#	if [ "${powr_lim[$x]}" -ge "10" ] && [ "${powr_lim[$x]}" -le "400" ]; then
-#		echo "Applying PowerLimit: ${powr_lim[$x]} watt for GPU $x"
-#		sudo nvidia-smi --id=$x -pl ${powr_lim[$x]} > /dev/null 2>&1 &
-#	fi
-sleep 0.2
+	#	if [ "${powr_lim[$x]}" -ge "10" ] && [ "${powr_lim[$x]}" -le "400" ]; then
+	#		echo "Applying PowerLimit: ${powr_lim[$x]} watt for GPU $x"
+	#		sudo nvidia-smi --id=$x -pl ${powr_lim[$x]} > /dev/null 2>&1 &
+	#	fi
+	sleep 0.2
 done
