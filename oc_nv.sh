@@ -89,9 +89,5 @@ for ((x=0; x<gpu_number; x++))  do
 	nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
 	nvidia-settings -a [gpu:$x]/GPUMemoryTransferRateOffset[$gpu_type]=${memo_clk[$x]} > /dev/null 2>&1 &
 	power_limit_set "${powr_lim[$x]}" $x
-	#	if [ "${powr_lim[$x]}" -ge "10" ] && [ "${powr_lim[$x]}" -le "400" ]; then
-	#		echo "Applying PowerLimit: ${powr_lim[$x]} watt for GPU $x"
-	#		sudo nvidia-smi --id=$x -pl ${powr_lim[$x]} > /dev/null 2>&1 &
-	#	fi
 	sleep 0.2
 done
