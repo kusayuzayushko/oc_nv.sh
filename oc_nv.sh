@@ -40,10 +40,10 @@ OptionMod core_clk
 OptionMod memo_clk
 OptionMod powr_lim
 
-# Checking if we dealing with 1050 or 1050 Ti
+# Checking if we dealing with p106, 1050 or 1050 Ti
 function gpu_check() {
 	line_n=$1
-	re='[[:space:]]GTX[[:space:]]1050[[:space:]]'
+re='[[:space:]]GTX[[:space:]](1050|p106-100|P106-100)[[:space:]]'
 	if [[ "${gpu_list[$line_n]}" =~ $re ]]; then
 		true
 	else
