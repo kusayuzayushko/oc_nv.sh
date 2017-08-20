@@ -76,6 +76,29 @@ function power_limit_set {
 	fi
 }
 
+# OC'ing core with negative values and cheching user input
+function core_clock_set() {
+	local core_arr=()
+	local str=`LC_ALL=C nvidia-settings -q [gpu:$1]/GPUGraphicsClockOffset[$2]`
+	# checking valid core OC values
+	local re='range (-*[0-9]*) - (-*[0-9]+)'
+	[[ $str =~ $re ]] && for (( i = 0; i < 3; i++ )); do
+		core_arr+=("${BASH_REMATCH[$i]}")
+	done
+	if [[ "$3" -lt "${core_arr[1]}" ]]; then
+		echo "Available core offset for GPU $1 is in ${core_arr[0]}"
+		echo "Applying CoreOffset: ${core_arr[1]}"
+		nvidia-settings -a [gpu:$1]/GPUGraphicsClockOffset[$2]=${core_arr[1]} > /dev/null 2>&1 &
+	elif [[ "$3" -gt "${core_arr[2]}" ]]; then
+		echo "Available core offset for GPU $1 is in ${core_arr[0]}"
+		echo "Applying CoreOffset: ${core_arr[2]}"
+		nvidia-settings -a [gpu:$1]/GPUGraphicsClockOffset[$2]=${core_arr[2]} > /dev/null 2>&1 &
+	else
+		echo "Applying CoreOffset: $3 for GPU $1"
+		nvidia-settings -a [gpu:$1]/GPUGraphicsClockOffset[$2]=$3 > /dev/null 2>&1 &
+	fi
+}
+
 # Setting Parameters to each gpu
 sudo nvidia-smi -pm 1 &
 for ((x=0; x<gpu_number; x++))  do
@@ -84,9 +107,11 @@ for ((x=0; x<gpu_number; x++))  do
 	else
 		gpu_type=3
 	fi
-	echo "Applying CoreOffset: ${core_clk[$x]} MemoryOffset: ${memo_clk[$x]} for GPU $x with GPU Type: $gpu_type"
+	# echo "Applying CoreOffset: ${core_clk[$x]} MemoryOffset: ${memo_clk[$x]} for GPU $x with GPU Type: $gpu_type"
 	nvidia-settings -a [gpu:$x]/GpuPowerMizerMode=1 > /dev/null 2>&1 &
-	nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
+	core_clock_set $x $gpu_type ${core_clk[$x]}
+	# nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
+	# call above moved to core_clock_set function.
 	nvidia-settings -a [gpu:$x]/GPUMemoryTransferRateOffset[$gpu_type]=${memo_clk[$x]} > /dev/null 2>&1 &
 	power_limit_set "${powr_lim[$x]}" $x
 	sleep 0.2
