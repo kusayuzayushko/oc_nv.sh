@@ -43,7 +43,7 @@ OptionMod powr_lim
 # Checking if we dealing with p106, 1050 or 1050 Ti
 function gpu_check() {
 	line_n=$1
-re='[[:space:]]GTX[[:space:]](1050|p106-100|P106-100)[[:space:]]'
+re='[[:space:]](GTX[[:space:]]1050)|(P106-100)[[:space:]]'
 	if [[ "${gpu_list[$line_n]}" =~ $re ]]; then
 		true
 	else
@@ -94,7 +94,7 @@ function core_clock_set() {
 		echo "Applying CoreOffset: ${core_arr[2]}"
 		nvidia-settings -a [gpu:$1]/GPUGraphicsClockOffset[$2]=${core_arr[2]} > /dev/null 2>&1 &
 	else
-		echo "Applying CoreOffset: $3 for GPU $1"
+		# echo "Applying CoreOffset: $3 for GPU $1"
 		nvidia-settings -a [gpu:$1]/GPUGraphicsClockOffset[$2]=$3 > /dev/null 2>&1 &
 	fi
 }
@@ -107,7 +107,7 @@ for ((x=0; x<gpu_number; x++))  do
 	else
 		gpu_type=3
 	fi
-	# echo "Applying CoreOffset: ${core_clk[$x]} MemoryOffset: ${memo_clk[$x]} for GPU $x with GPU Type: $gpu_type"
+	echo "Applying CoreOffset: ${core_clk[$x]} MemoryOffset: ${memo_clk[$x]} for GPU $x with GPU Type: $gpu_type"
 	nvidia-settings -a [gpu:$x]/GpuPowerMizerMode=1 > /dev/null 2>&1 &
 	core_clock_set $x $gpu_type ${core_clk[$x]}
 	# nvidia-settings -a [gpu:$x]/GPUGraphicsClockOffset[$gpu_type]=${core_clk[$x]} > /dev/null 2>&1 &
